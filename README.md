@@ -4,7 +4,7 @@
 
 Nothing OS-inspired typography meets compact, Winamp-inspired controls: CPU and NVIDIA GPU temperatures, GPU hotspot difference, temperature history, and PresentMon-based FPS integration.
 
-This repository contains the consolidated **v6 development prompt** and screenshots of the working local app.
+This repository contains the consolidated **v8 development prompt** and screenshots of the working local app.
 
 ## Screenshots
 
@@ -16,7 +16,7 @@ This repository contains the consolidated **v6 development prompt** and screensh
 
 ![Karmic Temps compact overlay showing FPS, CPU, GPU, hotspot, and hotspot difference](docs/screenshots/overlay.png)
 
-These are actual v6 app captures, not mockups. They were captured in a restricted development session: GPU and hotspot readings were available, while CPU access required elevation and FPS capture was inactive. CPU temperatures were separately confirmed working by the owner after installing PawnIO. Live in-game FPS remains to be verified.
+These are actual v8 app captures, not mockups. During capture, GPU and hotspot readings were available; CPU sensor access required elevation and FPS capture was inactive. The owner separately confirmed working CPU temperatures after PawnIO setup and working in-game FPS after the v7 fix.
 
 ## Features
 
@@ -24,11 +24,26 @@ These are actual v6 app captures, not mockups. They were captured in a restricte
 - **HOT:** GPU hotspot temperature. **ΔHOT:** hotspot minus core temperature, from the same GPU and sampling cycle.
 - Up to one hour of temperature history; selectable **30 seconds, 1, 5, 15, 30, or 60 minutes**.
 - A large, resizable graph with **CPU solid** and **GPU dashed** lines.
-- Shared temperature colors: **white below 60°C**, **amber from 60°C to below 80°C**, and **red at 80°C or above**. These are visualization bands, not hardware-specific safety limits.
-- A movable, click-through overlay that stays above ordinary desktop apps when the dashboard is minimized.
+- **Seven shared temperature colors**, from blue below 50°C to pink at 100°C and above; see the scale below. These are visualization bands, not hardware-specific safety limits.
+- A compact **250 × 220 pixel** movable, click-through overlay with tighter label/value spacing and rows; it stays above ordinary desktop apps when the dashboard is minimized.
+- **Widget transparency from 0–80%**, adjustable live and remembered after normal app closure.
 - PresentMon FPS integration with foreground-process detection or manual process selection.
 - Pause/resume temperature recording and CSV export, including hotspot and difference.
 - Custom vector dot-matrix lettering, dark inset panels, red KOO branding, and compact beveled controls.
+
+## Temperature colors
+
+Both graph series and the CPU/GPU/hotspot widget readings use the same scale. CPU remains solid and GPU dashed. The hotspot difference stays neutral because it is a relative difference.
+
+| Temperature | Color |
+| --- | --- |
+| Below 50°C | Blue |
+| 50°C to below 60°C | Cyan |
+| 60°C to below 70°C | Green |
+| 70°C to below 80°C | Yellow |
+| 80°C to below 90°C | Orange |
+| 90°C to below 100°C | Red |
+| 100°C and above | Pink |
 
 ## Controls
 
@@ -39,7 +54,10 @@ These are actual v6 app captures, not mockups. They were captured in a restricte
 | Timeline | Change the visible history window without clearing retained readings |
 | Expand graph | Maximize/restore the dashboard |
 | Refresh games | Refresh the process selector |
+| Widget transparency | 0% opaque to 80% transparent; default 10%; affects the entire widget |
 | Export CSV | Save retained temperature history |
+
+Transparency is saved on normal app close in `%LOCALAPPDATA%/KarmicTemps/widget-transparency.txt` and restored on launch.
 
 ## Development prompt
 
@@ -56,7 +74,11 @@ The overlay targets desktop, windowed, and borderless applications. Exclusive fu
 
 ## Project status
 
-The local v6 app has been built and checked for live GPU/hotspot readings, graph rendering, timeline switching, CSV output, and overlay behavior. FPS calculations have controlled-data tests; live in-game capture needs an elevated test with a real game. Source and downloadable binaries are not included in this documentation update.
+The local v8 app has been built and checked for live GPU/hotspot readings, all seven color boundaries, graph transitions and line styles, minimum/default window layouts, transparency persistence, and overlay behavior. FPS regression tests cover the real PresentMon CSV header, changing frame rates, process selection, swap-chain isolation, malformed rows, restart, and stale-data expiry.
+
+The v7 fix corrected a case-sensitive CSV column mismatch: PresentMon emits `msBetweenPresents`, while the old parser expected `MsBetweenPresents`. Matching now ignores casing and surrounding whitespace. The owner confirmed that in-game FPS works after this fix. Karmic Temps does not impose a 120 FPS cap; a simulated 240 FPS stream was also verified.
+
+See [CHANGELOG.md](CHANGELOG.md) for v7 and v8 changes. This repository contains the development brief and screenshots; runnable packages and application source have not been published here.
 
 ## Credits
 

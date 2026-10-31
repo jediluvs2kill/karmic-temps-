@@ -1,4 +1,4 @@
-# Karmic Temps — consolidated v6 development prompt
+# Karmic Temps — consolidated v8 development prompt
 
 Build or continue **Karmic Temps**, a small native Windows desktop temperature monitor branded **KOO**. Deliver a runnable application, editable source, build instructions, and genuine screenshots. Use the screenshots in `docs/screenshots/` as the current visual reference. This prompt describes the latest agreed behavior; implement it rather than producing only a design or plan.
 
@@ -34,18 +34,26 @@ The development machine is an Intel Core i9-13900HX / NVIDIA GeForce RTX 4070 La
 
   | Temperature | Color |
   | --- | --- |
-  | Below 60°C | Off-white |
-  | 60°C to below 80°C | Amber |
-  | 80°C or above | Red |
+  | Below 50°C | Blue (`#70A8FF`) |
+  | 50°C to below 60°C | Cyan (`#51D7EB`) |
+  | 60°C to below 70°C | Green (`#86DE84`) |
+  | 70°C to below 80°C | Yellow (`#F2D763`) |
+  | 80°C to below 90°C | Orange (`#FF9E4D`) |
+  | 90°C to below 100°C | Red (`#FF4B40`) |
+  | 100°C and above | Pink (`#F174DA`) |
 
-- Color each historical section according to its temperature, splitting segments at the 60°C and 80°C boundaries. Preserve gaps across missing readings and recording pauses. These are display bands, not universal thermal safety thresholds.
-- Provide **Pause / Resume** and **Export CSV**. CSV columns: timestamp, CPU core/hottest sensor, NVIDIA core, NVIDIA hotspot, hotspot difference. Use ISO timestamps, invariant decimal formatting, and blank fields for unavailable values. Export all retained temperature samples. FPS export is not part of v6.
+- Color each historical section according to its temperature, splitting segments at all six boundaries (50, 60, 70, 80, 90, and 100°C) in either direction. Preserve gaps across missing readings and recording pauses. These are display bands, not universal thermal safety thresholds.
+- Provide **Pause / Resume** and **Export CSV**. CSV columns: timestamp, CPU core/hottest sensor, NVIDIA core, NVIDIA hotspot, hotspot difference. Use ISO timestamps, invariant decimal formatting, and blank fields for unavailable values. Export all retained temperature samples. FPS export is not part of v8.
 
 ## Always-on overlay
 
 - Show the overlay automatically on normal launch. It stays visible when the dashboard is minimized and closes when the app exits.
 - Display **FPS, CPU, GPU, HOT, and ΔHOT**, plus the tracked application and a compact status line.
-- Use a borderless, topmost, slightly translucent window, initially around 300×244 pixels near the top-left of the display.
+- Use a borderless, topmost, slightly translucent window, initially around 250×220 pixels near the top-left of the display.
+- Use compact label/value columns (labels near x=12, values near x=58) and approximately 28-pixel row spacing. Fit readings such as `108.4 °C` without clipping.
+- Add a dashboard **Widget transparency** slider: 0–80%, default 10%, where 0% is fully opaque. Apply it immediately to the entire widget, including text, without changing dashboard opacity. Keep at least 20% opacity so the widget cannot become completely invisible.
+- Save the transparency setting on normal app closure in `%LOCALAPPDATA%/KarmicTemps/widget-transparency.txt`; restore it at startup. Clamp out-of-range values, fall back to 10% for missing/invalid settings, and tolerate storage errors. Preserve the chosen opacity when hiding/showing or locking/unlocking the widget.
+- Keep the transparency slider and capture status visible at both 900×600 and 1200×820 dashboard sizes.
 - Locked mode must be click-through and must not steal keyboard focus.
 - `Ctrl+Shift+O`: toggle visibility and FPS capture.
 - `Ctrl+Shift+M`: unlock/lock; allow dragging while unlocked. Provide equivalent dashboard controls if hotkeys are unavailable.
@@ -59,12 +67,13 @@ The development machine is an Intel Core i9-13900HX / NVIDIA GeForce RTX 4070 La
 - Measure the selected application's presentation rate, not display refresh rate, graph redraw rate, or the app's own timer frequency.
 - Support automatic foreground-process tracking and an explicit process selector with **Refresh games**.
 - The current integration reads PresentMon CSV using `--output_stdout --no_console_stats --v1_metrics --no_track_gpu --no_track_input --no_track_display` and a unique `--session_name`.
-- Parse CSV robustly, including quoted fields. Filter by the selected process. Use `TimeInSeconds`, `MsBetweenPresents`, and `SwapChainAddress`.
+- Parse CSV robustly, including quoted fields, header whitespace, and a possible BOM. Match column names case-insensitively and cache column positions. Filter by the selected `ProcessID`. PresentMon 2.6.0's legacy output uses `TimeInSeconds`, **`msBetweenPresents`** (lowercase `ms`), and `SwapChainAddress`. The earlier case-sensitive expectation `MsBetweenPresents` discarded every frame; preserve the v7 fix and test with the exact collector header.
+- Reset both header state and frame samples when capture restarts. Distinguish unsupported CSV columns, stopped capture, and no recent frames from the selected process. Name the selected process in dashboard status.
 - Calculate approximately one-second average app-present FPS as `1000 / mean(valid frame interval in milliseconds)` for the most active swap chain. Do not add rates from different swap chains.
 - Clear old process measurements when the target changes. Expire stale frame data after roughly 2.5 seconds. Desktop FPS is not applicable; no recent valid data means a dash.
 - Show capture errors clearly, including access-denied errors. Treat app-present FPS as distinct from displayed FPS, especially with dropped or generated frames.
 - Keep only the needed in-memory frame data. Stop the app's own named capture session and child process when disabling the overlay or exiting. Avoid affecting other PresentMon users/sessions.
-- Live in-game capture has not yet been verified in the restricted development environment. Validate it in an elevated run with a real game before claiming it works end to end.
+- The owner confirmed working in-game FPS after the v7 parser fix. Automated coverage still uses controlled frame streams; do not claim universal game compatibility. There is no 120 FPS display cap. Preserve support for 240 FPS and above without confusing the monitor's refresh rate with measured game FPS.
 
 ## Visual direction: dot matrix × classic Winamp
 
@@ -82,7 +91,7 @@ Use a **Nothing OS-inspired dot-matrix display combined with a compact Winamp-st
 
 ## Validation and handoff
 
-Build the release executable and portable ZIP. Verify live GPU/core/hotspot readings where accessible and distinguish actual readings from test fixtures. Test missing-sensor behavior and CSV output across locales; test 59.99/60/79.99/80°C boundary colors, line styles over dense samples, color crossings, missing-data gaps, all timeline views, and minimum-size layout. Check overlay show/hide, click-through locking, dragging, hotkeys, and visibility while the dashboard is minimized. Check FPS process filtering, swap-chain handling, invalid CSV, target changes, and stale-data expiry. Run an elevated game capture when available.
+Build the release executable and portable ZIP. Verify live GPU/core/hotspot readings where accessible and distinguish actual readings from test fixtures. Test missing-sensor behavior and CSV output across locales; test values just below and exactly at every 50/60/70/80/90/100°C color boundary, line styles over dense samples, color crossings, missing-data gaps, all timeline views, and minimum-size layout. Check overlay show/hide, click-through locking, dragging, hotkeys, and visibility while the dashboard is minimized. Check transparency endpoints, immediate slider updates, saved-setting roundtrips, corrupt/missing setting fallback, and opacity across lock/show transitions. Check FPS using the exact PresentMon 2.6.0 legacy CSV header, changing frame rates including 240 FPS, process filtering, swap-chain handling, invalid CSV, target changes, capture reset, unsupported-column diagnostics, and stale-data expiry. Run an elevated game capture when available.
 
 Take genuine screenshots of the final dashboard and overlay. If the capture environment lacks CPU access or active FPS capture, state that in the caption instead of editing in plausible values. Keep test-only simulated graphs out of normal app screens and release screenshots.
 
