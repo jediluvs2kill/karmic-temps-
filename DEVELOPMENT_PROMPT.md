@@ -4,7 +4,7 @@ Build or continue **Karmic Temps**, a small native Windows desktop temperature m
 
 ## Platform and packaging
 
-Use C# WinForms targeting 64-bit Windows and .NET Framework 4.7.2 or later. The current implementation is organized as `KarmicTemps.cs`, `Overlay.cs`, and `Theme.cs`, with `app.manifest`, `KarmicTemps.exe.config`, `koo.ico`, and `build.ps1`. These names describe the existing local implementation; this repository update supplies the brief and screenshots, not those source files.
+Use C# WinForms targeting 64-bit Windows and .NET Framework 4.7.2 or later. The current implementation is organized as `KarmicTemps.cs`, `Overlay.cs`, and `Theme.cs`, with `app.manifest`, `KarmicTemps.exe.config`, `koo.ico`, and `build.ps1`. These source files are included in the downloadable KarmicTemps-v8.zip release asset. The repository tree contains this brief and screenshots; GitHub's automatic source archives are not the runnable app package.
 
 Produce a portable ZIP that runs after extraction. Keep sensor dependencies in `sensors/` and the PresentMon console executable in `fps/`. Use an application manifest requesting administrator rights. Bundle dependency licenses and source links. Download dependencies only from their official releases, pin versions, and verify provided checksums or signatures. Do not install drivers silently.
 

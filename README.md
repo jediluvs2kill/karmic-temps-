@@ -4,7 +4,11 @@
 
 Nothing OS-inspired typography meets compact, Winamp-inspired controls: CPU and NVIDIA GPU temperatures, GPU hotspot difference, temperature history, and PresentMon-based FPS integration.
 
-This repository contains the consolidated **v8 development prompt** and screenshots of the working local app.
+**[Download Karmic Temps v8 for Windows](https://github.com/jediluvs2kill/karmic-temps-/releases/download/v8/KarmicTemps-v8.zip)** · [Release notes](https://github.com/jediluvs2kill/karmic-temps-/releases/tag/v8)
+
+Extract the entire ZIP, open the `KarmicTemps-v8` folder, and run `KarmicTemps.exe`. Approve the administrator prompt. If CPU setup is needed, use **Set up CPU** and reopen the app afterward.
+
+The runnable release ZIP includes the application, editable C# source, build/test scripts, and required dependencies. This repository also contains the consolidated **v8 development prompt** and screenshots.
 
 ## Screenshots
 
@@ -78,7 +82,7 @@ The local v8 app has been built and checked for live GPU/hotspot readings, all s
 
 The v7 fix corrected a case-sensitive CSV column mismatch: PresentMon emits `msBetweenPresents`, while the old parser expected `MsBetweenPresents`. Matching now ignores casing and surrounding whitespace. The owner confirmed that in-game FPS works after this fix. Karmic Temps does not impose a 120 FPS cap; a simulated 240 FPS stream was also verified.
 
-See [CHANGELOG.md](CHANGELOG.md) for v7 and v8 changes. This repository contains the development brief and screenshots; runnable packages and application source have not been published here.
+See [CHANGELOG.md](CHANGELOG.md) for v7 and v8 changes. The runnable package and application source are available together in the [v8 release ZIP](https://github.com/jediluvs2kill/karmic-temps-/releases/tag/v8). GitHub's automatically generated source archives contain the repository documentation; choose **KarmicTemps-v8.zip** to run or build the app.
 
 ## Credits
 
